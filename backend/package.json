@@ -1,0 +1,28 @@
+{
+  "name": "snapsave-backend",
+  "version": "1.0.0",
+  "description": "SnapSave expense tracker backend API",
+  "main": "src/server.js",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "groq-sdk": "^0.37.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.2",
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.14",
+    "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "^2.16.105"
+  }
+}

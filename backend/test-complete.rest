@@ -1,0 +1,767 @@
+##########################################################
+#                                                        #
+#   SnapSave API — Complete Testing Workflow             #
+#                                                        #
+#   HOW TO USE:                                          #
+#   1. Install "REST Client" extension in VS Code        #
+#   2. Start backend: npm run dev (from backend/)        #
+#   3. Run requests TOP-TO-BOTTOM in order               #
+#   4. After LOGIN, copy the token from the response     #
+#      and replace every TOKEN_HERE below                #
+#   5. After creating transactions, copy an _id from     #
+#      the response and replace TRANSACTION_ID below     #
+#   6. After creating goals, copy an _id from            #
+#      the response and replace GOAL_ID below            #
+#                                                        #
+#   TIP: Use Ctrl+Shift+H to find & replace all at once #
+#                                                        #
+##########################################################
+
+
+### =========================================================
+### SECTION 1: HEALTH & INFO (No Auth Required)
+### =========================================================
+
+### 1.1 — API Root Info
+# Expected: 200 OK — returns API name, version, endpoints list
+GET http://localhost:5000/
+
+### 1.2 — Health Check
+# Expected: 200 OK — returns status "ok", db "connected"
+GET http://localhost:5000/health
+
+
+### =========================================================
+### SECTION 2: AUTHENTICATION
+### =========================================================
+
+### 2.1 — Register a New User
+# Expected: 201 Created — returns { token, user: { id, name, email } }
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "testuser@snapsave.com",
+  "password": "Test@1234"
+}
+
+### 2.2 — Register — Duplicate Email (Error Case)
+# Expected: 409 Conflict — "Email already registered"
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User Again",
+  "email": "testuser@snapsave.com",
+  "password": "Another@1234"
+}
+
+### 2.3 — Register — Missing Fields (Error Case)
+# Expected: 400 Bad Request — validation errors
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "No Email User"
+}
+
+### 2.4 — Register — Short Password (Error Case)
+# Expected: 400 Bad Request — password too short (min 6)
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Short Pass",
+  "email": "shortpass@snapsave.com",
+  "password": "123"
+}
+
+### 2.5 — Register — Invalid Email Format (Error Case)
+# Expected: 400 Bad Request — invalid email
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Bad Email",
+  "email": "not-an-email",
+  "password": "Test@1234"
+}
+
+### 2.6 — Login
+# Expected: 200 OK — returns { token, user: { id, name, email } }
+#
+# ╔══════════════════════════════════════════════════════╗
+# ║  IMPORTANT: Copy the "token" value from the         ║
+# ║  response and replace ALL instances of TOKEN_HERE   ║
+# ║  in this file. (Ctrl+Shift+H → TOKEN_HERE)         ║
+# ╚══════════════════════════════════════════════════════╝
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@snapsave.com",
+  "password": "Test@1234"
+}
+
+### 2.7 — Login — Wrong Password (Error Case)
+# Expected: 401 Unauthorized — "Invalid credentials"
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@snapsave.com",
+  "password": "WrongPassword"
+}
+
+### 2.8 — Login — Non-existent User (Error Case)
+# Expected: 401 Unauthorized — "Invalid credentials"
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nobody@snapsave.com",
+  "password": "Test@1234"
+}
+
+### 2.9 — Get Current User Profile
+# Expected: 200 OK — returns { id, name, email }
+GET http://localhost:5000/api/auth/me
+Authorization: Bearer TOKEN_HERE
+
+### 2.10 — Get Profile — No Token (Error Case)
+# Expected: 401 Unauthorized — "Not authorized, no token"
+GET http://localhost:5000/api/auth/me
+
+### 2.11 — Get Profile — Invalid Token (Error Case)
+# Expected: 401 Unauthorized — "Not authorized, token failed"
+GET http://localhost:5000/api/auth/me
+Authorization: Bearer this.is.not.a.valid.jwt.token
+
+
+### =========================================================
+### SECTION 3: TRANSACTIONS — CREATE
+### =========================================================
+
+### 3.1 — Create Transactions (Bulk)
+# Expected: 201 Created — returns { count, transactions: [...] }
+#
+# ╔══════════════════════════════════════════════════════╗
+# ║  After this request, copy an "_id" from one of the  ║
+# ║  returned transactions and replace all instances of  ║
+# ║  TRANSACTION_ID in this file.                        ║
+# ╚══════════════════════════════════════════════════════╝
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "transactions": [
+    {
+      "date": "2026-02-01",
+      "merchant": "Swiggy",
+      "amount": 450,
+      "type": "DEBIT",
+      "category": "food"
+    },
+    {
+      "date": "2026-02-02",
+      "merchant": "Uber",
+      "amount": 230,
+      "type": "DEBIT",
+      "category": "transport"
+    },
+    {
+      "date": "2026-02-03",
+      "merchant": "Amazon",
+      "amount": 1899,
+      "type": "DEBIT",
+      "category": "shopping"
+    },
+    {
+      "date": "2026-02-05",
+      "merchant": "Netflix",
+      "amount": 649,
+      "type": "DEBIT",
+      "category": "entertainment"
+    },
+    {
+      "date": "2026-02-06",
+      "merchant": "Apollo Pharmacy",
+      "amount": 320,
+      "type": "DEBIT",
+      "category": "health"
+    },
+    {
+      "date": "2026-02-07",
+      "merchant": "Jio Recharge",
+      "amount": 299,
+      "type": "DEBIT",
+      "category": "recharge"
+    },
+    {
+      "date": "2026-02-10",
+      "merchant": "Company Salary",
+      "amount": 50000,
+      "type": "CREDIT",
+      "category": "transfers"
+    },
+    {
+      "date": "2026-02-12",
+      "merchant": "Zomato",
+      "amount": 380,
+      "type": "DEBIT",
+      "category": "food"
+    },
+    {
+      "date": "2026-02-15",
+      "merchant": "Flipkart",
+      "amount": 2499,
+      "type": "DEBIT",
+      "category": "shopping"
+    },
+    {
+      "date": "2026-02-20",
+      "merchant": "GPay Transfer from Friend",
+      "amount": 5000,
+      "type": "CREDIT",
+      "category": "transfers"
+    }
+  ]
+}
+
+### 3.2 — Create Single Transaction
+# Expected: 201 Created — returns { count: 1, transactions: [...] }
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "date": "2026-02-25",
+  "merchant": "BigBasket",
+  "amount": 750,
+  "type": "DEBIT",
+  "category": "food"
+}
+
+### 3.3 — Create Transaction — Missing Required Fields (Error Case)
+# Expected: 400 Bad Request — validation error (missing date, amount, type)
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "transactions": [
+    {
+      "merchant": "Incomplete"
+    }
+  ]
+}
+
+### 3.4 — Create Transaction — Invalid Type (Error Case)
+# Expected: 400 Bad Request — type must be DEBIT or CREDIT
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "transactions": [
+    {
+      "date": "2026-02-20",
+      "merchant": "Test",
+      "amount": 100,
+      "type": "INVALID"
+    }
+  ]
+}
+
+### 3.5 — Create Transaction — No Auth Token (Error Case)
+# Expected: 401 Unauthorized
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+
+{
+  "transactions": [
+    {
+      "date": "2026-02-20",
+      "merchant": "No Auth",
+      "amount": 100,
+      "type": "DEBIT"
+    }
+  ]
+}
+
+
+### =========================================================
+### SECTION 4: TRANSACTIONS — READ & FILTER
+### =========================================================
+
+### 4.1 — Get All Transactions (Default Pagination)
+# Expected: 200 OK — returns { count, page, totalPages, transactions }
+# Default: page=1, limit=50
+GET http://localhost:5000/api/transactions
+Authorization: Bearer TOKEN_HERE
+
+### 4.2 — Get Transactions — With Pagination
+# Expected: 200 OK — page 1, limit 3
+GET http://localhost:5000/api/transactions?page=1&limit=3
+Authorization: Bearer TOKEN_HERE
+
+### 4.3 — Get Transactions — Page 2
+# Expected: 200 OK — second page of results
+GET http://localhost:5000/api/transactions?page=2&limit=3
+Authorization: Bearer TOKEN_HERE
+
+### 4.4 — Get Transactions — Filter by Category
+# Expected: 200 OK — only "food" category transactions
+GET http://localhost:5000/api/transactions?category=food
+Authorization: Bearer TOKEN_HERE
+
+### 4.5 — Get Transactions — Filter by Type (DEBIT)
+# Expected: 200 OK — only debit transactions
+GET http://localhost:5000/api/transactions?type=DEBIT
+Authorization: Bearer TOKEN_HERE
+
+### 4.6 — Get Transactions — Filter by Type (CREDIT)
+# Expected: 200 OK — only credit transactions
+GET http://localhost:5000/api/transactions?type=CREDIT
+Authorization: Bearer TOKEN_HERE
+
+### 4.7 — Get Transactions — Filter by Date Range
+# Expected: 200 OK — transactions between Feb 1 and Feb 10
+GET http://localhost:5000/api/transactions?startDate=2026-02-01&endDate=2026-02-10
+Authorization: Bearer TOKEN_HERE
+
+### 4.8 — Get Transactions — Combined Filters
+# Expected: 200 OK — food debits in first half of Feb
+GET http://localhost:5000/api/transactions?category=food&type=DEBIT&startDate=2026-02-01&endDate=2026-02-15
+Authorization: Bearer TOKEN_HERE
+
+### 4.9 — Get Single Transaction by ID
+# Expected: 200 OK — returns single transaction object
+# Replace TRANSACTION_ID with a real _id from section 3.1
+GET http://localhost:5000/api/transactions/TRANSACTION_ID
+Authorization: Bearer TOKEN_HERE
+
+### 4.10 — Get Transaction — Invalid ID Format (Error Case)
+# Expected: 400 or 500 — invalid ObjectId
+GET http://localhost:5000/api/transactions/not-a-valid-id
+Authorization: Bearer TOKEN_HERE
+
+### 4.11 — Get Transaction — Non-existent ID (Error Case)
+# Expected: 404 Not Found
+GET http://localhost:5000/api/transactions/000000000000000000000000
+Authorization: Bearer TOKEN_HERE
+
+
+### =========================================================
+### SECTION 5: TRANSACTIONS — SUMMARY
+### =========================================================
+
+### 5.1 — Get Transaction Summary (All Time)
+# Expected: 200 OK — { totalSpent, totalReceived, netBalance, categories }
+GET http://localhost:5000/api/transactions/summary
+Authorization: Bearer TOKEN_HERE
+
+### 5.2 — Get Transaction Summary — With Date Range
+# Expected: 200 OK — summary for Feb 2026 only
+GET http://localhost:5000/api/transactions/summary?startDate=2026-02-01&endDate=2026-02-28
+Authorization: Bearer TOKEN_HERE
+
+### 5.3 — Get Summary — No Auth (Error Case)
+# Expected: 401 Unauthorized
+GET http://localhost:5000/api/transactions/summary
+
+
+### =========================================================
+### SECTION 6: TRANSACTIONS — UPDATE
+### =========================================================
+
+### 6.1 — Update Transaction — Change Category & Amount
+# Expected: 200 OK — returns updated transaction
+# Replace TRANSACTION_ID with a real _id
+PUT http://localhost:5000/api/transactions/TRANSACTION_ID
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "category": "entertainment",
+  "amount": 500
+}
+
+### 6.2 — Update Transaction — Change Merchant Name
+# Expected: 200 OK — returns updated transaction
+PUT http://localhost:5000/api/transactions/TRANSACTION_ID
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "merchant": "Updated Merchant Name"
+}
+
+### 6.3 — Update Transaction — Change Type
+# Expected: 200 OK — flip type from DEBIT to CREDIT
+PUT http://localhost:5000/api/transactions/TRANSACTION_ID
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "CREDIT"
+}
+
+### 6.4 — Update Transaction — Non-existent ID (Error Case)
+# Expected: 404 Not Found
+PUT http://localhost:5000/api/transactions/000000000000000000000000
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "amount": 999
+}
+
+
+### =========================================================
+### SECTION 7: TRANSACTIONS — DELETE
+### =========================================================
+
+### 7.1 — Delete Single Transaction
+# Expected: 200 OK — { message: "Transaction deleted." }
+# Replace TRANSACTION_ID with a real _id you want to remove
+DELETE http://localhost:5000/api/transactions/TRANSACTION_ID
+Authorization: Bearer TOKEN_HERE
+
+### 7.2 — Delete Transaction — Non-existent ID (Error Case)
+# Expected: 404 Not Found
+DELETE http://localhost:5000/api/transactions/000000000000000000000000
+Authorization: Bearer TOKEN_HERE
+
+### 7.3 — Delete Transaction — No Auth (Error Case)
+# Expected: 401 Unauthorized
+DELETE http://localhost:5000/api/transactions/TRANSACTION_ID
+
+
+### =========================================================
+### SECTION 8: GOALS — CREATE
+### =========================================================
+
+### 8.1 — Create Monthly Savings Goal
+# Expected: 201 Created — returns goal with currentAmount and progress
+#
+# ╔══════════════════════════════════════════════════════╗
+# ║  Copy the "_id" from the response and replace all   ║
+# ║  instances of GOAL_ID in this file.                  ║
+# ╚══════════════════════════════════════════════════════╝
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "monthly_savings",
+  "targetAmount": 10000,
+  "month": "2026-02"
+}
+
+### 8.2 — Create Category Budget Goal (Food)
+# Expected: 201 Created
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "category_budget",
+  "targetAmount": 2000,
+  "month": "2026-02",
+  "category": "food"
+}
+
+### 8.3 — Create Category Budget Goal (Shopping)
+# Expected: 201 Created
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "category_budget",
+  "targetAmount": 5000,
+  "month": "2026-02",
+  "category": "shopping"
+}
+
+### 8.4 — Create Category Budget Goal (Transport)
+# Expected: 201 Created
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "category_budget",
+  "targetAmount": 1000,
+  "month": "2026-02",
+  "category": "transport"
+}
+
+### 8.5 — Create Goal — Duplicate (Error Case)
+# Expected: 400 Bad Request — "A similar goal already exists"
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "monthly_savings",
+  "targetAmount": 15000,
+  "month": "2026-02"
+}
+
+### 8.6 — Create Goal — Missing Fields (Error Case)
+# Expected: 400 Bad Request — missing required fields
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "monthly_savings"
+}
+
+### 8.7 — Create Category Budget — Missing Category (Error Case)
+# Expected: 400 Bad Request — category required for category_budget
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "category_budget",
+  "targetAmount": 3000,
+  "month": "2026-02"
+}
+
+### 8.8 — Create Goal — Invalid Type (Error Case)
+# Expected: 400 Bad Request — invalid goal type
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "type": "invalid_type",
+  "targetAmount": 5000,
+  "month": "2026-02"
+}
+
+### 8.9 — Create Goal — No Auth (Error Case)
+# Expected: 401 Unauthorized
+POST http://localhost:5000/api/goals
+Content-Type: application/json
+
+{
+  "type": "monthly_savings",
+  "targetAmount": 10000,
+  "month": "2026-02"
+}
+
+
+### =========================================================
+### SECTION 9: GOALS — READ & FILTER
+### =========================================================
+
+### 9.1 — Get All Goals (With Live Progress)
+# Expected: 200 OK — returns goals[] with currentAmount and progress %
+GET http://localhost:5000/api/goals
+Authorization: Bearer TOKEN_HERE
+
+### 9.2 — Get Goals — Filter by Month
+# Expected: 200 OK — only goals for Feb 2026
+GET http://localhost:5000/api/goals?month=2026-02
+Authorization: Bearer TOKEN_HERE
+
+### 9.3 — Get Goals — Different Month (Should Be Empty)
+# Expected: 200 OK — empty array or no goals
+GET http://localhost:5000/api/goals?month=2026-03
+Authorization: Bearer TOKEN_HERE
+
+### 9.4 — Get Single Goal by ID
+# Expected: 200 OK — returns goal with currentAmount and progress
+# Replace GOAL_ID with a real _id from section 8.1
+GET http://localhost:5000/api/goals/GOAL_ID
+Authorization: Bearer TOKEN_HERE
+
+### 9.5 — Get Goal — Non-existent ID (Error Case)
+# Expected: 404 Not Found
+GET http://localhost:5000/api/goals/000000000000000000000000
+Authorization: Bearer TOKEN_HERE
+
+### 9.6 — Get Goals — No Auth (Error Case)
+# Expected: 401 Unauthorized
+GET http://localhost:5000/api/goals
+
+
+### =========================================================
+### SECTION 10: GOALS — UPDATE
+### =========================================================
+
+### 10.1 — Update Goal — Change Target Amount
+# Expected: 200 OK — returns updated goal with recalculated progress
+PUT http://localhost:5000/api/goals/GOAL_ID
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "targetAmount": 8000
+}
+
+### 10.2 — Update Goal — Mark as Achieved
+# Expected: 200 OK — status changes to "achieved"
+PUT http://localhost:5000/api/goals/GOAL_ID
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "status": "achieved"
+}
+
+### 10.3 — Update Goal — Mark as Failed
+# Expected: 200 OK — status changes to "failed"
+PUT http://localhost:5000/api/goals/GOAL_ID
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "status": "failed"
+}
+
+### 10.4 — Update Goal — Reset to Active
+# Expected: 200 OK — status back to "active"
+PUT http://localhost:5000/api/goals/GOAL_ID
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "status": "active"
+}
+
+### 10.5 — Update Goal — Non-existent ID (Error Case)
+# Expected: 404 Not Found
+PUT http://localhost:5000/api/goals/000000000000000000000000
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{
+  "targetAmount": 9999
+}
+
+
+### =========================================================
+### SECTION 11: GOALS — DELETE
+### =========================================================
+
+### 11.1 — Delete Goal
+# Expected: 200 OK — { message: "Goal deleted" }
+# Replace GOAL_ID with an _id you want to remove
+DELETE http://localhost:5000/api/goals/GOAL_ID
+Authorization: Bearer TOKEN_HERE
+
+### 11.2 — Delete Goal — Non-existent ID (Error Case)
+# Expected: 404 Not Found
+DELETE http://localhost:5000/api/goals/000000000000000000000000
+Authorization: Bearer TOKEN_HERE
+
+### 11.3 — Delete Goal — No Auth (Error Case)
+# Expected: 401 Unauthorized
+DELETE http://localhost:5000/api/goals/GOAL_ID
+
+
+### =========================================================
+### SECTION 12: PDF UPLOAD
+### =========================================================
+
+### 12.1 — Upload PhonePe PDF Statement
+# Expected: 201 Created — returns parsed transactions
+# NOTE: Replace the file path with an actual PhonePe PDF on your machine
+POST http://localhost:5000/api/upload
+Authorization: Bearer TOKEN_HERE
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="pdf"; filename="statement.pdf"
+Content-Type: application/pdf
+
+< ./sample-statement.pdf
+------FormBoundary--
+
+### 12.2 — Upload — No File (Error Case)
+# Expected: 400 Bad Request — "Please upload a PDF file"
+POST http://localhost:5000/api/upload
+Authorization: Bearer TOKEN_HERE
+
+### 12.3 — Upload — No Auth (Error Case)
+# Expected: 401 Unauthorized
+POST http://localhost:5000/api/upload
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="pdf"; filename="statement.pdf"
+Content-Type: application/pdf
+
+< ./sample-statement.pdf
+------FormBoundary--
+
+
+### =========================================================
+### SECTION 13: CLEANUP — DELETE ALL TRANSACTIONS
+### =========================================================
+
+### 13.1 — Delete All Transactions for User
+# Expected: 200 OK — { deletedCount, message }
+# ⚠️  WARNING: This removes ALL your transactions!
+DELETE http://localhost:5000/api/transactions/all
+Authorization: Bearer TOKEN_HERE
+
+### 13.2 — Delete All — No Auth (Error Case)
+# Expected: 401 Unauthorized
+DELETE http://localhost:5000/api/transactions/all
+
+
+### =========================================================
+### SECTION 14: 404 — UNKNOWN ROUTES
+### =========================================================
+
+### 14.1 — Unknown API Route
+# Expected: 404 — "Route not found"
+GET http://localhost:5000/api/nonexistent
+
+### 14.2 — Unknown Nested Route
+# Expected: 404 — "Route not found"
+POST http://localhost:5000/api/transactions/unknown/route
+Content-Type: application/json
+Authorization: Bearer TOKEN_HERE
+
+{}
+
+
+##########################################################
+#                                                        #
+#   TESTING CHECKLIST                                    #
+#                                                        #
+#   [ ] Health & Info (1.1 — 1.2)                        #
+#   [ ] Register new user (2.1)                          #
+#   [ ] Register error cases (2.2 — 2.5)                 #
+#   [ ] Login and COPY TOKEN (2.6)                       #
+#   [ ] Login error cases (2.7 — 2.8)                    #
+#   [ ] Replace TOKEN_HERE everywhere                    #
+#   [ ] Auth profile & errors (2.9 — 2.11)              #
+#   [ ] Create transactions bulk (3.1) → COPY _id        #
+#   [ ] Replace TRANSACTION_ID everywhere                #
+#   [ ] Create single + errors (3.2 — 3.5)              #
+#   [ ] Read & filter transactions (4.1 — 4.11)         #
+#   [ ] Transaction summary (5.1 — 5.3)                 #
+#   [ ] Update transactions (6.1 — 6.4)                 #
+#   [ ] Delete transactions (7.1 — 7.3)                 #
+#   [ ] Create goals (8.1) → COPY _id                   #
+#   [ ] Replace GOAL_ID everywhere                       #
+#   [ ] Create goals + errors (8.2 — 8.9)              #
+#   [ ] Read & filter goals (9.1 — 9.6)                 #
+#   [ ] Update goals (10.1 — 10.5)                      #
+#   [ ] Delete goals (11.1 — 11.3)                      #
+#   [ ] PDF upload (12.1 — 12.3)                        #
+#   [ ] Cleanup (13.1 — 13.2)                           #
+#   [ ] 404 routes (14.1 — 14.2)                        #
+#                                                        #
+##########################################################

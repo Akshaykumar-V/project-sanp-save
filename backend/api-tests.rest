@@ -1,0 +1,31 @@
+### Health Check
+GET http://localhost:5000/health
+
+###
+
+### Register New User
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Akshay Kumar",
+  "email": "akshay@snapsave.com",
+  "password": "Test@123"
+}
+
+###
+
+### Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "akshay@snapsave.com",
+  "password": "Test@123"
+}
+
+###
+
+### Get Current User (Protected - replace <token> with JWT from login response)
+GET http://localhost:5000/api/auth/me
+Authorization: Bearer <token>

@@ -1,0 +1,15 @@
+### Login to get token
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "your_email@test.com",
+  "password": "your_password"
+}
+
+###
+
+### Test AI Tips (replace YOUR_TOKEN_HERE with token from above)
+POST http://localhost:5000/api/ai/tips
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json

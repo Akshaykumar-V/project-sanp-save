@@ -1,0 +1,177 @@
+##############################################################
+#  SnapSave API — Full Test Suite (REST Client)
+#
+#  HOW TO USE:
+#  1. Install the "REST Client" VS Code extension
+#  2. Start the backend server:  npm run dev
+#  3. Run requests in ORDER (top → bottom)
+#  4. After LOGIN (#3), copy the token from the response
+#     and replace every eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE below
+#  5. After CREATE TRANSACTIONS (#5), copy an _id from
+#     the response and replace 699f0fa83e6db5256c1ac749
+#  6. After CREATE GOAL (#11 or #12), copy an _id and
+#     replace GOAL_ID_HERE
+##############################################################
+
+
+### 1. HEALTH CHECK — Verify server & database status
+GET http://localhost:5000/health
+
+
+### 2. REGISTER USER — Create a new account
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Akshay Kumar",
+  "email": "akshay@snapsave.com",
+  "password": "Test@123"
+}
+
+
+### 3. LOGIN USER — Authenticate and receive JWT token
+# ⚠️ Copy the "token" value from the response below
+#    and paste it in place of eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE everywhere
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "akshay@snapsave.com",
+  "password": "Test@123"
+}
+
+
+### 4. GET CURRENT USER — Fetch logged-in user profile
+GET http://localhost:5000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 5. CREATE TRANSACTIONS (Bulk) — Add multiple transactions at once
+# ⚠️ Copy an _id from the response to use in UPDATE/DELETE tests
+POST http://localhost:5000/api/transactions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+Content-Type: application/json
+
+{
+  "transactions": [
+    {
+      "date": "2025-02-20",
+      "merchant": "ZOMATO",
+      "amount": 350,
+      "type": "DEBIT",
+      "category": "food"
+    },
+    {
+      "date": "2025-02-20",
+      "merchant": "Paul Raj",
+      "amount": 1000,
+      "type": "CREDIT",
+      "category": "transfers"
+    }
+  ]
+}
+
+
+### 6. GET ALL TRANSACTIONS — List every transaction for the user
+GET http://localhost:5000/api/transactions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 7. GET TRANSACTION SUMMARY — Aggregated spending/income stats
+GET http://localhost:5000/api/transactions/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 8. GET TRANSACTIONS WITH FILTERS — Filter by category & type
+GET http://localhost:5000/api/transactions?category=food&type=DEBIT
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 9. UPDATE TRANSACTION — Modify an existing transaction
+# ⚠️ Replace with a real _id from step 5
+PUT http://localhost:5000/api/transactions/699f11093e6db5256c1ac78b
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+Content-Type: application/json
+
+{
+  "merchant": "SWIGGY",
+  "amount": 400
+}
+
+
+### 10. DELETE TRANSACTION — Remove a single transaction
+# ⚠️ Replace with a real _id from step 5
+DELETE http://localhost:5000/api/transactions/699f11093e6db5256c1ac78c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 11. CREATE GOAL (Monthly Savings) — Set a savings target for a month
+# ⚠️ Copy the _id from the response to use in UPDATE/DELETE tests
+POST http://localhost:5000/api/goals
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+Content-Type: application/json
+
+{
+  "type": "monthly_savings",
+  "targetAmount": 10000,
+  "month": "2025-02"
+}
+
+
+### 12. CREATE GOAL (Category Budget) — Set a spending limit per category
+POST http://localhost:5000/api/goals
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+Content-Type: application/json
+
+{
+  "type": "category_budget",
+  "targetAmount": 5000,
+  "month": "2025-02",
+  "category": "food"
+}
+
+
+### 13. GET ALL GOALS — List every goal for the user
+GET http://localhost:5000/api/goals
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 14. GET GOALS FOR SPECIFIC MONTH — Filter goals by YYYY-MM
+GET http://localhost:5000/api/goals?month=2025-02
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 15. UPDATE GOAL — Change target amount or status
+# ⚠️ Replace GOAL_ID_HERE with a real _id from step 11 or 12
+PUT http://localhost:5000/api/goals/699f12da3e6db5256c1ac7a5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+Content-Type: application/json
+
+{
+  "targetAmount": 12000
+}
+
+
+### 16. DELETE GOAL — Remove a goal
+# ⚠️ Replace GOAL_ID_HERE with a real _id from step 11 or 12
+DELETE http://localhost:5000/api/goals/699f12dd3e6db5256c1ac7a9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+
+
+### 17. UPLOAD PDF — Parse a PhonePe/bank statement PDF
+# ⚠️ Replace the file path with your actual PDF location
+POST http://localhost:5000/api/upload
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="pdf"; filename="PhonePe_Statement_Jan2026_Feb2026 (1).pdf"
+Content-Type: application/pdf
+
+< C:\Users\AKSHAY KUMAR\Downloads\PhonePe_Statement_Jan2026_Feb2026 (1).pdf
+------WebKitFormBoundary--
+
+
+### 18. DELETE ALL TRANSACTIONS — Wipe all transactions for the user
+DELETE http://localhost:5000/api/transactions/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWYwYzZkM2U2ZGI1MjU2YzFhYzcyZCIsImVtYWlsIjoiYWtzaGF5QHNuYXBzYXZlLmNvbSIsImlhdCI6MTc3MjAzMTI3NCwiZXhwIjoxNzcyNjM2MDc0fQ.tSzPd7dfxQp3QTnEOSDnjF6ju8N8VztE6n3StE_8PoE
