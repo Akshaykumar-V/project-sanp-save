@@ -89,3 +89,22 @@ describe('AI Prompt Service', () => {
     );
   });
 });
+test('should instruct AI to return structured recommendations', () => {
+  const result = buildFinancialPrompt({
+    profile: {
+      totalSpent: 2000,
+    },
+  });
+
+  expect(result.systemPrompt).toContain(
+    'Return recommendations as a JSON array'
+  );
+
+  expect(result.systemPrompt).toContain(
+    'type, title, message, evidence, and action'
+  );
+
+  expect(result.systemPrompt).toContain(
+    'evidence must only use values present'
+  );
+});
