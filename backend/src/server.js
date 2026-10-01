@@ -47,6 +47,7 @@ app.get('/', (req, res) => {
       transactions: '/api/transactions (GET, POST, DELETE /:id)',
       goals: '/api/goals (GET, POST, GET /:id, PUT /:id, DELETE /:id)',
       upload: '/api/upload (POST /pdf)',
+      ai: '/api/ai (POST /tips, POST /recommendations)',
     },
   });
 });
