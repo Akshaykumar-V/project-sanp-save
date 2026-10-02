@@ -121,4 +121,7 @@ export const goalAPI = {
 export const aiAPI = {
   generateTips: () =>
     request('/ai/tips', { method: 'POST', auth: true }),
+
+  generateRecommendations: () =>
+    request('/ai/recommendations', { method: 'POST', auth: true }),
 }
