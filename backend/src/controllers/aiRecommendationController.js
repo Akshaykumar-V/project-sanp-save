@@ -9,6 +9,9 @@ const {
   getSpendingChanges,
 } = require('../services/spendingComparisonService');
 const {
+  getSpendingPeriods,
+} = require('../services/spendingPeriodService');
+const {
   buildFinancialContext,
 } = require('../services/financialContextService');
 const {
@@ -38,10 +41,15 @@ async function generateRecommendations(req, res) {
     const profile = buildSpendingProfile(transactions);
     const patterns = detectSpendingPatterns(transactions);
 
-    // The first API version uses the complete available transaction history.
-    // Previous/current period comparison will be added when date-range
-    // intelligence is introduced.
-    const comparisons = getSpendingChanges([], transactions);
+    const {
+      previousTransactions,
+      currentTransactions,
+    } = getSpendingPeriods(transactions);
+
+    const comparisons = getSpendingChanges(
+      previousTransactions,
+      currentTransactions
+    );
 
     const context = buildFinancialContext({
       profile,
