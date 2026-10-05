@@ -129,6 +129,68 @@ describe('aiRecommendationController', () => {
     );
   });
 
+  test('uses previous and current calendar months for spending comparisons', async () => {
+    const transactions = [
+      {
+        date: new Date('2026-09-05'),
+        merchant: 'Amruth Tea',
+        amount: 40,
+        type: 'DEBIT',
+        category: 'food',
+        entityKey: 'amruth_tea',
+      },
+      {
+        date: new Date('2026-09-15'),
+        merchant: 'Amruth Tea',
+        amount: 50,
+        type: 'DEBIT',
+        category: 'food',
+        entityKey: 'amruth_tea',
+      },
+      {
+        date: new Date('2026-10-05'),
+        merchant: 'Amruth Tea',
+        amount: 100,
+        type: 'DEBIT',
+        category: 'food',
+        entityKey: 'amruth_tea',
+      },
+    ];
+
+    Transaction.find.mockReturnValue({
+      sort: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue(transactions),
+      }),
+    });
+
+    generateFinancialRecommendations.mockResolvedValue([]);
+
+    const req = {
+      user: {
+        id: 'user-123',
+      },
+    };
+
+    const res = createResponse();
+
+    await generateRecommendations(req, res);
+
+    expect(
+      generateFinancialRecommendations
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        comparisons: expect.arrayContaining([
+          expect.objectContaining({
+            entityKey: 'amruth_tea',
+            previousAmount: 90,
+            currentAmount: 100,
+            changeAmount: 10,
+          }),
+        ]),
+      })
+    );
+  });
+
   test('returns 503 when Gemini is not configured', async () => {
     Transaction.find.mockReturnValue({
       sort: jest.fn().mockReturnValue({
