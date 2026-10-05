@@ -1,7 +1,7 @@
 const { normalizeTransaction } = require('./normalizer');
 const { categorize } = require('../categorize');
 
-const DATE_PATTERN = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/;
+const DATE_PATTERN = /(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/;
 
 const AMOUNT_PATTERN =
   /₹?\s*(\d+(?:,\d+)*(?:\.\d{2})?)/g;
@@ -65,7 +65,7 @@ function parsePhonePeLine(line) {
 }
 
 function parseDate(value) {
-  const parts = value.split(/[\/-]/);
+  const parts = value.split(/[/-]/);
 
   if (parts.length !== 3) {
     return null;

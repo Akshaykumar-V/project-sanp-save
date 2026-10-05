@@ -47,6 +47,8 @@ export function AuthProvider({ children }) {
         })
         .finally(() => setLoading(false))
     }
+    // Intentionally runs once on mount to restore the authenticated session.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function register(name, email, password) {

@@ -15,7 +15,7 @@ function UploadPage() {
     if (isAuthenticated && file) {
       try {
         // Upload PDF to backend
-        const result = await uploadPDF(file)
+        await uploadPDF(file)
         // Refetch transactions from server so dashboard has fresh data
         await refetch()
         setTimeout(() => navigate('/dashboard'), 1500)

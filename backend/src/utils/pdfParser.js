@@ -6,7 +6,7 @@ function parsePhonePeText(text) {
   const lines = text.split('\n');
 
   lines.forEach((line) => {
-    const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/;
+    const datePattern = /(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/;
     const amountPattern = /₹?\s*(\d+(?:,\d+)*(?:\.\d{2})?)/g;
 
     const dateMatch = line.match(datePattern);
@@ -40,14 +40,14 @@ function parsePhonePeText(text) {
 function extractMerchant(line) {
   const cleaned = line
     .replace(/₹?\s*\d+(?:,\d+)*(?:\.\d{2})?/g, '')
-    .replace(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/g, '')
+    .replace(/\d{1,2}[/-]\d{1,2}[/-]\d{2,4}/g, '')
     .replace(/\s+/g, ' ')
     .trim();
   return cleaned.slice(0, 50) || null;
 }
 
 function formatDate(dateStr) {
-  const parts = dateStr.split(/[\/\-]/);
+  const parts = dateStr.split(/[/-]/);
   if (parts.length === 3) {
     const day = parts[0].padStart(2, '0');
     const month = parts[1].padStart(2, '0');

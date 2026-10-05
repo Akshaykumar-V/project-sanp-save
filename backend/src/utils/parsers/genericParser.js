@@ -10,7 +10,7 @@ function parseGenericUPIText(text) {
 
   for (const line of lines) {
     const dateMatch = line.match(
-      /\b(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})\b/
+      /\b(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})\b/
     );
 
     if (!dateMatch) {
@@ -76,7 +76,7 @@ function parseGenericUPIText(text) {
 }
 
 function parseDate(value) {
-  const parts = value.split(/[\/-]/);
+  const parts = value.split(/[/-]/);
 
   if (parts.length !== 3) {
     return null;

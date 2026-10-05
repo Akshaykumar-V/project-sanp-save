@@ -341,7 +341,7 @@ function DashboardPage() {
               <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gray-50 flex items-center justify-center">
                 <span className="text-3xl">🤖</span>
               </div>
-              <p>Click <strong>"Generate Tips"</strong> to get AI-powered financial advice!</p>
+              <p>Click <strong>&quot;Generate Tips&quot;</strong> to get AI-powered financial advice!</p>
             </div>
           )}
         </Card>

@@ -36,7 +36,7 @@ async function generateRecommendation(prompt, options = {}) {
   const maxRetries = options.maxRetries ?? 2;
   let attempt = 0;
 
-  while (true) {
+  while (attempt <= maxRetries) {
     try {
       const response = await ai.models.generateContent({
         model: MODEL,
