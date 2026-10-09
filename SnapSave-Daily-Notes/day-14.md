@@ -113,8 +113,9 @@ The Gemini client's `generateContent()` method was mocked to return:
 
 ```text
 {"recommendation":"Reduce food spending"}
+```
 
-7. Temporary 503 Retry Test
+## 7. Temporary 503 Retry Test
 The fourth test checks one of the most important parts of the provider.
 External AI services can temporarily return errors such as:
 503 UNAVAILABLE
@@ -129,7 +130,7 @@ The test verifies that the provider retries the request and eventually returns t
 The Gemini mock was called:
 2 times
 This confirms that temporary failures do not immediately terminate the request.
-8. Non-Retryable Error Test
+## 8. Non-Retryable Error Test
 The fifth test checks permanent or non-retryable errors.
 The simulated error was:
 Invalid request
@@ -138,21 +139,21 @@ The provider should immediately reject the request.
 The test verifies that the Gemini client was called only:
 1 time
 This is important because retrying permanent errors would create unnecessary requests.
-9. Initial Test Setup Issue
+## 9. Initial Test Setup Issue
 During development of the tests, an initial mocking setup caused a test failure.
 The Gemini mock was initially configured in a way that caused multiple tests to receive the same rejected response.
 This did not indicate a problem with the production provider.
 The test mock setup was corrected by configuring GoogleGenAI.mockImplementation() separately for the tests that require different Gemini responses.
 After correcting the mock setup, all five tests passed.
 This was useful because it confirmed that the tests were actually controlling the simulated provider behavior correctly.
-10. Targeted Test Result
+## 10. Targeted Test Result
 After creating the test file, the Gemini provider test suite was executed separately.
 Final result:
 5 tests passed
 5 tests total
 0 failed
 The test suite covered both successful and failure scenarios.
-11. Full Backend Regression Testing
+## 11. Full Backend Regression Testing
 After the new tests passed, the complete backend Jest suite was executed.
 Final result:
 17 test suites passed
@@ -160,7 +161,7 @@ Final result:
 0 failed
 This means the five new Gemini provider tests were added without breaking the existing SnapSave backend tests.
 The full regression test confirmed that the previous functionality remained stable.
-12. Coverage Improvement
+## 12. Coverage Improvement
 Before adding the Gemini provider tests, the backend coverage was:
 - Statements: 84.59%
 - Branches: 73.40%
@@ -172,7 +173,7 @@ After adding the Day 14 tests:
 - Functions: 92.72%
 - Lines: 90.13%
 The biggest improvement came from directly testing the previously less-covered Gemini provider code.
-13. Gemini Provider Coverage
+## 13. Gemini Provider Coverage
 The Gemini provider itself achieved very high test coverage.
 Final coverage for the provider was approximately:
 - Statements: 100%
@@ -181,7 +182,7 @@ Final coverage for the provider was approximately:
 - Lines: 100%
 Only one branch related to the alternative high-demand error condition remained uncovered.
 This means the important provider behaviors are now directly protected by tests.
-14. Why Mocking Was Used
+## 14. Why Mocking Was Used
 The Gemini API was not called directly during the Jest tests.
 Instead, the Google Gemini SDK was mocked.
 This provides several advantages:
@@ -192,13 +193,13 @@ This provides several advantages:
 5. Permanent errors can be simulated reliably.
 6. Test results do not depend on external API availability.
 This makes the provider tests deterministic.
-15. Production Code Changes
+## 15. Production Code Changes
 Day 14 did not introduce a new application feature.
 The main production provider implementation was already present.
 The primary Day 14 addition was:
 backend/tests/geminiProvider.test.js
 The purpose of the day was therefore stabilization through automated testing rather than adding new user-facing functionality.
-16. Git Work
+## 16. Git Work
 Day 14 was developed on:
 feature/day14-stabilization
 The test changes were committed with:
@@ -209,7 +210,7 @@ PR #13
 The pull request targeted:
 develop
 After verification, PR #13 was merged into develop.
-17. Develop Branch Synchronization
+## 17. Develop Branch Synchronization
 After merging the pull request, the local repository was switched back to:
 develop
 The latest changes were pulled from GitHub.
@@ -218,7 +219,7 @@ a8b1d58
 to:
 81eaa12
 The merged Gemini provider test file was now part of the develop branch.
-18. Final Repository Verification
+## 18. Final Repository Verification
 After pulling the merged changes, the repository status was checked.
 The working tree was clean.
 This confirmed that:
@@ -226,7 +227,7 @@ This confirmed that:
 - The feature branch changes were merged
 - Local develop was synchronized
 - No uncommitted changes remained
-19. What Was Completed
+## 19. What Was Completed
 By the end of Day 14:
 - Gemini provider test suite created
 - Invalid prompt validation tested
@@ -249,10 +250,12 @@ By the end of Day 14:
 - PR #13 merged into develop
 - Local develop synchronized
 - Working tree clean
-20. Day 14 Conclusion
+## 20. Day 14 Conclusion
 Day 14 was focused on making the Gemini integration more reliable.
 Instead of adding another feature, the existing AI provider was tested against both normal and failure scenarios.
 The important result is that SnapSave now has automated protection around the Gemini provider's critical behavior:
+
+```text
 Invalid Input
       ↓
 Validation
@@ -268,6 +271,7 @@ Temporary Error
 Retry
       ↓
 Success / Final Failure
+```
 
 The backend now has:
 17 test suites

@@ -52,58 +52,76 @@ Prompt Construction
 Gemini AI
      ↓
 Structured Recommendation
-🛠 Tech Stack
-Frontend
-Technology	Purpose
-React 18	UI framework with hooks
-Vite 5	Development server & production bundler
-Tailwind CSS 3	Utility-first styling
-React Router v6	Client-side routing with protected routes
-Recharts	Charts and financial visualizations
-pdfjs-dist	PDF parsing support
-Context API	Authentication state management
+```
 
+## 🛠 Tech Stack
 
-Backend
-Technology	Purpose
-Express.js	REST API server
-MongoDB Atlas	Cloud database
-Mongoose	ODM with schema validation
-bcryptjs	Password hashing
-jsonwebtoken	JWT authentication
-multer	PDF file upload handling
-pdfjs-dist	Server-side PDF text extraction
-cors	Cross-origin requests
-nodemon	Development auto-restart
-Jest	Automated backend testing
+### Frontend
 
+| Technology | Purpose |
+| --- | --- |
+| React 18 | UI framework with hooks |
+| Vite 5 | Development server & production bundler |
+| Tailwind CSS 3 | Utility-first styling |
+| React Router v6 | Client-side routing with protected routes |
+| Recharts | Charts and financial visualizations |
+| pdfjs-dist | PDF parsing support |
+| Context API | Authentication state management |
 
-AI
-Technology	Purpose
-Google Gemini API	AI-powered financial recommendations
-@google/genai	Gemini API client
-Custom retry handling	Handles temporary AI service failures
+### Backend
 
+| Technology | Purpose |
+| --- | --- |
+| Express.js | REST API server |
+| MongoDB Atlas | Cloud database |
+| Mongoose | ODM with schema validation |
+| bcryptjs | Password hashing |
+| jsonwebtoken | JWT authentication |
+| multer | PDF file upload handling |
+| pdfjs-dist | Server-side PDF text extraction |
+| cors | Cross-origin requests |
+| nodemon | Development auto-restart |
+| Jest | Automated backend testing |
 
-🚀 Getting Started
-Prerequisites
+### AI
+
+| Technology | Purpose |
+| --- | --- |
+| Google Gemini API | AI-powered financial recommendations |
+| @google/genai | Gemini API client |
+| Custom retry handling | Handles temporary AI service failures |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
 - Node.js v18+ and npm
 - MongoDB Atlas account or local MongoDB instance
 - Gemini API key for AI recommendation functionality
-1. Clone the Repository
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/Akshaykumar-V/project-sanp-save.git
 cd project-sanp-save
+```
 
-2. Setup Backend
+### 2. Setup Backend
+
+```bash
 cd backend
 npm install
+```
 
 Create a backend/.env file:
+
+```env
 PORT=5000
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/snapsave?retryWrites=true&w=majority
 JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRE=7d
 GEMINI_API_KEY=your_gemini_api_key_here
+```
 
 Replace:
 - <username> with your MongoDB username
@@ -113,34 +131,64 @@ Replace:
 URL-encode special characters in the MongoDB password if required. For example, @ becomes %40.
 
 Start the backend:
+
+```bash
 npm run dev
+```
 
 The backend runs on:
+
+```text
 http://localhost:5000
+```
 
 For production:
-npm start
 
-3. Setup Frontend
+```bash
+npm start
+```
+
+### 3. Setup Frontend
+
 From the project root:
+
+```bash
 npm install
+```
 
 Create a root .env file:
+
+```env
 VITE_API_URL=http://localhost:5000/api
+```
 
 Start the frontend:
+
+```bash
 npm run dev
+```
 
 The frontend runs on:
-http://localhost:5500
 
-4. Build for Production
+```text
+http://localhost:5500
+```
+
+### 4. Build for Production
+
+```bash
 npm run build
+```
 
 Preview the production build:
-npm run preview
 
-📁 Project Structure
+```bash
+npm run preview
+```
+
+## 📁 Project Structure
+
+```text
 project-sanp-save/
 │
 ├── public/
@@ -246,33 +294,43 @@ project-sanp-save/
 ├── vercel.json
 ├── index.html
 └── README.md
+```
 
-🔌 API Reference
-All API endpoints are prefixed with /api.
+## 🔌 API Reference
+All API endpoints are prefixed with `/api`.
 Protected routes require:
+
+```http
 Authorization: Bearer <token>
+```
 
-Health Check
-Method	Endpoint	Description
-GET	/api/health	Server status check
+### Health Check
 
-
-Authentication
-Method	Endpoint	Description
-POST	/api/auth/register	Create account
-POST	/api/auth/login	Login and receive JWT
-GET	/api/auth/me	Get current authenticated user
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/health` | Server status check |
 
 
-Transactions
-Method	Endpoint	Description
-GET	/api/transactions	List transactions
-GET	/api/transactions/summary	Aggregated totals and category breakdown
-POST	/api/transactions	Create one or multiple transactions
-GET	/api/transactions/:id	Get a single transaction
-PUT	/api/transactions/:id	Update transaction
-DELETE	/api/transactions/:id	Delete transaction
-DELETE	/api/transactions/all	Delete all user transactions
+### Authentication
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/api/auth/register` | Create account |
+| POST | `/api/auth/login` | Login and receive JWT |
+| GET | `/api/auth/me` | Get current authenticated user |
+
+
+### Transactions
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/transactions` | List transactions |
+| GET | `/api/transactions/summary` | Aggregated totals and category breakdown |
+| POST | `/api/transactions` | Create one or multiple transactions |
+| GET | `/api/transactions/:id` | Get a single transaction |
+| PUT | `/api/transactions/:id` | Update transaction |
+| DELETE | `/api/transactions/:id` | Delete transaction |
+| DELETE | `/api/transactions/all` | Delete all user transactions |
 
 
 Supported transaction filters include:
@@ -283,28 +341,32 @@ type
 page
 limit
 
-Goals
-Method	Endpoint	Description
-GET	/api/goals	List goals
-POST	/api/goals	Create goal
-GET	/api/goals/:id	Get goal with progress
-PUT	/api/goals/:id	Update goal
-DELETE	/api/goals/:id	Delete goal
+### Goals
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/goals` | List goals |
+| POST | `/api/goals` | Create goal |
+| GET | `/api/goals/:id` | Get goal with progress |
+| PUT | `/api/goals/:id` | Update goal |
+| DELETE | `/api/goals/:id` | Delete goal |
 
 
 Monthly filtering is supported through:
 ?month=YYYY-MM
 
-Upload
-Method	Endpoint	Description
-POST	/api/upload	Upload PhonePe PDF, parse transactions and store them
+### Upload
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/api/upload` | Upload PhonePe PDF, parse transactions and store them |
 
 
 The endpoint expects:
-multipart/form-data
+`multipart/form-data`
 
 with the PDF provided through the pdf field.
-AI Recommendations
+### AI Recommendations
 The AI recommendation functionality uses the financial context already processed by SnapSave.
 The backend:
 1. receives the user's financial context
@@ -315,9 +377,11 @@ The backend:
 6. retries temporary retryable failures when appropriate
 7. returns the original error when the failure is not retryable
 Gemini configuration is provided through:
+```env
 GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-📱 How to Upload a PhonePe Statement
+## 📱 How to Upload a PhonePe Statement
 1. Open the PhonePe app.
 2. Open your profile.
 3. Go to Transaction History.
@@ -334,8 +398,11 @@ GEMINI_API_KEY=your_gemini_api_key_here
 14. Dashboard and analytics update using the uploaded data.
 Don't have a statement PDF? Use the sample/demo data option to explore the application.
 
-🧩 How It Works
-Main Data Flow
+## 🧩 How It Works
+
+### Main Data Flow
+
+```text
 PhonePe PDF
      ↓
 Upload
@@ -357,21 +424,25 @@ Dashboard / Insights / Goals
 Financial Context
      ↓
 AI Recommendation
+```
 
-🏷 Transaction Categories
+## 🏷 Transaction Categories
 SnapSave currently uses keyword-based categorization for common transaction types.
-Category	Example Keywords
-Food	swiggy, zomato, restaurant, chai, cafe, pizza
-Transport	uber, ola, rapido, metro, petrol, fuel
-Shopping	amazon, flipkart, myntra, mall
-Entertainment	netflix, hotstar, spotify, pvr, movie
-Health	apollo, pharmacy, hospital, medplus
-Recharge	jio, airtel, vi, broadband, recharge
-Transfers	sent to, received from, paid to, neft, imps
-Other	everything else
+| Category | Example Keywords |
+| --- | --- |
+| Food | swiggy, zomato, restaurant, chai, cafe, pizza |
+| Transport | uber, ola, rapido, metro, petrol, fuel |
+| Shopping | amazon, flipkart, myntra, mall |
+| Entertainment | netflix, hotstar, spotify, pvr, movie |
+| Health | apollo, pharmacy, hospital, medplus |
+| Recharge | jio, airtel, vi, broadband, recharge |
+| Transfers | sent to, received from, paid to, neft, imps |
+| Other | everything else |
 
 
-🔐 Authentication Flow
+## 🔐 Authentication Flow
+
+```text
 Register / Login
        ↓
 Server validates credentials
@@ -385,12 +456,15 @@ Bearer token sent with protected API requests
 Backend verifies JWT
        ↓
 Request allowed / rejected
+```
 
 On a 401 response, the frontend clears the authentication state and redirects the user to the authentication page.
 On page refresh, AuthContext verifies the current token through:
 GET /api/auth/me
 
-📊 Analytics Pipeline
+## 📊 Analytics Pipeline
+
+```text
 Raw Transactions
        ↓
 useTransactions
@@ -414,8 +488,11 @@ Financial Context
 Dashboard / Insights / Goals
        ↓
 AI Recommendation Layer
+```
 
-🤖 AI Recommendation Flow
+## 🤖 AI Recommendation Flow
+
+```text
 User Transactions
        ↓
 Spending Analytics
@@ -433,16 +510,20 @@ Gemini API
 Structured Response
        ↓
 Recommendation
+```
 
 The Gemini provider also contains retry handling for temporary service failures.
 Example retryable situations include temporary 503 / UNAVAILABLE responses.
 Non-retryable errors are returned without unnecessary retries.
-🧪 Testing
+## 🧪 Testing
 SnapSave V1 includes both API-level REST Client testing and automated Jest testing.
-Jest Test Suite
+### Jest Test Suite
 Backend tests are executed using:
+
+```bash
 cd backend
 npm test
+```
 
 Current V1 validation:
 17 test suites passed
@@ -460,14 +541,14 @@ The automated tests cover areas including:
 - Gemini provider behavior
 - retry handling
 - error handling
-Gemini Provider Tests
+### Gemini Provider Tests
 The Gemini provider specifically has automated coverage for:
 - invalid prompts
 - missing GEMINI_API_KEY
 - successful Gemini response
 - retryable 503 failure followed by success
 - non-retryable error without retry
-Test Coverage
+### Test Coverage
 Latest backend Jest coverage:
 Statements : 90.27%
 Branches   : 79.12%
@@ -476,7 +557,7 @@ Lines      : 90.13%
 
 The goal of the testing work was not simply to increase a percentage.
 The focus was to verify important application behavior and protect the areas that are most likely to affect the user experience.
-🔬 REST API Testing
+## 🔬 REST API Testing
 A REST Client test file is also included:
 backend/test-complete.rest
 
@@ -495,7 +576,7 @@ It contains requests covering:
 - monthly goal queries
 - PDF upload
 Open the file in VS Code using the REST Client extension and execute individual requests.
-🛠 Development Validation
+## 🛠 Development Validation
 Before V1 release readiness, the project was checked using:
 Backend Tests
 npm test -- --runInBand
@@ -516,16 +597,20 @@ Git Diff Validation
 git diff --check
 
 No whitespace errors were reported during the final validation.
-🚀 Deployment
-Frontend
+## 🚀 Deployment
+
+### Frontend
 The project contains Vercel configuration for SPA routing.
 Example:
+
+```bash
 npx vercel
+```
 
 Frontend environment variable:
 VITE_API_URL=https://your-backend-url.com/api
 
-Backend
+### Backend
 The backend can be deployed using platforms such as Render or Railway.
 Required environment variables:
 MONGODB_URI=...
@@ -536,77 +621,93 @@ PORT=5000
 
 Current Deployment Status
 The V1 project has deployment configuration prepared, but production deployment has not yet been completed.
-🔧 Environment Variables
-Backend (backend/.env)
-Variable	Description	Example
-PORT	Backend server port	5000
-MONGODB_URI	MongoDB connection string	mongodb+srv://...
-JWT_SECRET	Secret used for JWT signing	your_secret
-JWT_EXPIRE	JWT expiry duration	7d
-GEMINI_API_KEY	Gemini API authentication key	your_api_key
+## 🔧 Environment Variables
+
+### Backend (`backend/.env`)
+
+| Variable | Description | Example |
+| --- | --- | --- |
+| PORT | Backend server port | 5000 |
+| MONGODB_URI | MongoDB connection string | mongodb+srv://... |
+| JWT_SECRET | Secret used for JWT signing | your_secret |
+| JWT_EXPIRE | JWT expiry duration | 7d |
+| GEMINI_API_KEY | Gemini API authentication key | your_api_key |
 
 
-Frontend (.env)
-Variable	Description	Example
-VITE_API_URL	Backend API base URL	http://localhost:5000/api
+### Frontend (`.env`)
+
+| Variable | Description | Example |
+| --- | --- | --- |
+| VITE_API_URL | Backend API base URL | http://localhost:5000/api |
 
 
 Never commit .env files or API keys to GitHub.
 
-📦 Scripts
-Frontend (package.json)
-Script	Description
-npm run dev	Start Vite development server
-npm run build	Create production build
-npm run preview	Preview production build
-npm run lint	Run ESLint
+## 📦 Scripts
+
+### Frontend (`package.json`)
+
+| Script | Description |
+| --- | --- |
+| `npm run dev` | Start Vite development server |
+| `npm run build` | Create production build |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
 
 
-Backend (backend/package.json)
-Script	Description
-npm run dev	Start backend with nodemon
-npm start	Start production backend
-npm test	Run Jest backend test suite
+### Backend (`backend/package.json`)
+
+| Script | Description |
+| --- | --- |
+| `npm run dev` | Start backend with nodemon |
+| `npm start` | Start production backend |
+| `npm test` | Run Jest backend test suite |
 
 
-📈 Project Status
-Area	Status	Notes
-Backend API	✅	Core API functionality implemented and tested
-Frontend Pages	✅	Six main application pages integrated
-Authentication	✅	JWT login/register, protected routes and 401 handling
-PDF Parsing	✅	PhonePe statements supported; additional edge cases may require tuning
-Categorization	✅	Keyword-based categorization across 8 categories
-Analytics	✅	Spending, merchant, category and financial analysis
-Goals & Budgets	✅	CRUD operations and spending-based progress
-AI Recommendations	✅	Gemini provider integrated with retry/error handling
-Automated Testing	✅	17 suites and 101 tests passing
-Test Coverage	✅	90.27% statement coverage
-Production Build	✅	Vite production build completed successfully
-Lint	✅	ESLint validation completed successfully
-Deployment	🔲	Configuration prepared; production deployment not yet completed
+## 📈 Project Status
+
+| Area | Status | Notes |
+| --- | --- | --- |
+| Backend API | ✅ | Core API functionality implemented and tested |
+| Frontend Pages | ✅ | Six main application pages integrated |
+| Authentication | ✅ | JWT login/register, protected routes and 401 handling |
+| PDF Parsing | ✅ | PhonePe statements supported; additional edge cases may require tuning |
+| Categorization | ✅ | Keyword-based categorization across 8 categories |
+| Analytics | ✅ | Spending, merchant, category and financial analysis |
+| Goals & Budgets | ✅ | CRUD operations and spending-based progress |
+| AI Recommendations | ✅ | Gemini provider integrated with retry/error handling |
+| Automated Testing | ✅ | 17 suites and 101 tests passing |
+| Test Coverage | ✅ | 90.27% statement coverage |
+| Production Build | ✅ | Vite production build completed successfully |
+| Lint | ✅ | ESLint validation completed successfully |
+| Deployment | 🔲 | Configuration prepared; production deployment not yet completed |
 
 
-🗓 SnapSave V1 — 15 Day Development Roadmap
+## 🗓 SnapSave V1 — 15 Day Development Roadmap
 The V1 development was approached as a progressive system rather than building disconnected features.
-Day	Main Work
-Day 1	Universal UPI Parser Foundation
-Day 2	Parser Testing and Automated Validation
-Day 3	Smart Categorization Foundation
-Day 4	Real Transaction Integration
-Day 5	Transaction Intelligence / Entity Knowledge
-Day 6	Personal Spending Intelligence
-Day 7	Financial Insight Foundation
-Day 8	AI Prompt & Recommendation Foundation
-Day 9	Gemini AI Recommendation Integration
-Day 10	AI Integration and Application Flow
-Day 11	Application Stabilization and Integration
-Day 12	V1 Feature Integration and Validation
-Day 13	Development Setup Stabilization
-Day 14	Gemini Provider Testing and Reliability
-Day 15	Final V1 Stabilization and Release Readiness
+
+| Day | Main Work |
+| --- | --- |
+| Day 1 | Universal UPI Parser Foundation |
+| Day 2 | Parser Testing and Automated Validation |
+| Day 3 | Smart Categorization Foundation |
+| Day 4 | Real Transaction Integration |
+| Day 5 | Transaction Intelligence / Entity Knowledge |
+| Day 6 | Personal Spending Intelligence |
+| Day 7 | Financial Insight Foundation |
+| Day 8 | AI Prompt & Recommendation Foundation |
+| Day 9 | Gemini AI Recommendation Integration |
+| Day 10 | AI Integration and Application Flow |
+| Day 11 | Application Stabilization and Integration |
+| Day 12 | V1 Feature Integration and Validation |
+| Day 13 | Development Setup Stabilization |
+| Day 14 | Gemini Provider Testing and Reliability |
+| Day 15 | Final V1 Stabilization and Release Readiness |
 
 
-🧠 V1 Development Progression
+## 🧠 V1 Development Progression
+
+```text
 UPI PDF
    ↓
 Universal Parser
@@ -636,10 +737,13 @@ Automated Testing
 Production Build Validation
    ↓
 V1 Release Readiness
+```
 
-🎯 Core Product Principle
+## 🎯 Core Product Principle
 SnapSave should not automatically label a transaction as "waste" based on one payment.
 The intended approach is:
+
+```text
 Transaction
     ↓
 Understand entity
@@ -653,14 +757,17 @@ Compare with user's own history
 Generate evidence-based insight
     ↓
 Use AI to explain or recommend
+```
 
 Unknown does not mean unnecessary.
 Known does not automatically mean good.
 The system should use evidence and the user's own spending history before making stronger observations.
 AI is intended to explain and assist with the financial context generated by SnapSave, not replace the underlying data and analytics.
-🔄 Git & GitHub Development Workflow
+## 🔄 Git & GitHub Development Workflow
 SnapSave V1 was developed using Git branches and pull requests rather than making all changes directly on the main branch.
-General workflow:
+### General workflow
+
+```text
 main
   │
   └── develop
@@ -670,8 +777,11 @@ main
         ├── feature/day3-...
         ├── ...
         └── feature/day14-stabilization
+        ```
 
-The general development process was:
+        The general development process was:
+
+        ```text
 Create feature branch
         ↓
 Implement feature / fix
@@ -689,9 +799,11 @@ Create Pull Request
 Merge into develop
         ↓
 Continue next development stage
+```
 
 main is intended to remain the stable branch, while develop is used for active V1 integration.
-📚 Daily Development Notes
+
+## 📚 Daily Development Notes
 Detailed development notes are maintained separately in:
 SnapSave-Daily-Notes/
 
@@ -706,10 +818,12 @@ The notes document:
 - lessons learned
 - understanding of the implementation
 - connection between one development day and the next
-📄 License
+
+## 📄 License
+
 MIT
+
 <p align="center">
   Built with ❤️ for better personal financial awareness<br>
   © 2026 SnapSave
 </p>
-```
