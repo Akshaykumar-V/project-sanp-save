@@ -38,7 +38,7 @@ function parsePhonePeStatement(text) {
   
   lines.forEach(line => {
     // Try to extract transaction data from common PhonePe PDF formats
-    const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/
+    const datePattern = /(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/
     const amountPattern = /₹?\s*(\d+(?:,\d+)*(?:\.\d{2})?)/g
     
     const dateMatch = line.match(datePattern)
@@ -72,7 +72,7 @@ function extractMerchant(line) {
   // Remove common prefixes/suffixes and extract merchant name
   const cleaned = line
     .replace(/₹?\s*\d+(?:,\d+)*(?:\.\d{2})?/g, '')
-    .replace(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/g, '')
+    .replace(/\d{1,2}[/-]\d{1,2}[/-]\d{2,4}/g, '')
     .replace(/\s+/g, ' ')
     .trim()
   
@@ -80,7 +80,7 @@ function extractMerchant(line) {
 }
 
 function formatDate(dateStr) {
-  const parts = dateStr.split(/[\/\-]/)
+  const parts = dateStr.split(/[/-]/)
   if (parts.length === 3) {
     const day = parts[0].padStart(2, '0')
     const month = parts[1].padStart(2, '0')

@@ -41,6 +41,31 @@ const transactionSchema = new mongoose.Schema(
       },
       required: [true, 'Transaction type is required'],
     },
+
+    provider: {
+      type: String,
+      enum: ['PHONEPE', 'GOOGLE_PAY', 'PAYTM', 'BHIM', 'AMAZON_PAY', 'UNKNOWN'],
+      default: 'UNKNOWN',
+    },
+
+    entityKey: {
+      type: String,
+      default: null,
+      index: true,
+    },
+
+    entityType: {
+      type: String,
+      enum: ['PERSON', 'MERCHANT', 'SELF_TRANSFER', 'UNKNOWN'],
+      default: 'UNKNOWN',
+    },
+
+    transactionRole: {
+      type: String,
+      enum: ['EXPENSE', 'INCOME', 'SELF_TRANSFER'],
+      default: 'EXPENSE',
+    },
+
     category: {
       type: String,
       enum: {
