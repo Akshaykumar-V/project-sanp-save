@@ -14,7 +14,13 @@ export function removeToken() {
 
 export function getStoredUser() {
   const raw = localStorage.getItem('snapsave_user')
-  return raw ? JSON.parse(raw) : null
+  if (!raw) return null
+  try {
+    return JSON.parse(raw)
+  } catch {
+    removeStoredUser()
+    return null
+  }
 }
 
 export function setStoredUser(user) {
