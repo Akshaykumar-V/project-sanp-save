@@ -1,4 +1,5 @@
 const { categorize } = require('../categorize');
+const { extractIdentifiers } = require('./identifiers');
 
 function parseGenericUPIText(text) {
   if (!text || typeof text !== 'string') {
@@ -8,7 +9,8 @@ function parseGenericUPIText(text) {
   const transactions = [];
   const lines = text.split(/\r?\n/);
 
-  for (const line of lines) {
+  for (const rawLine of lines) {
+    const { text: line, transactionId, utrNumber } = extractIdentifiers(rawLine);
     const dateMatch = line.match(
       /\b(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})\b/
     );
@@ -68,7 +70,9 @@ function parseGenericUPIText(text) {
       amount,
       type,
       category: categorize(merchant),
-      rawText: line.slice(0, 200),
+      rawText: rawLine.slice(0, 200),
+      transactionId,
+      utrNumber,
     });
   }
 

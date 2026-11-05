@@ -20,7 +20,7 @@ function parseUPIStatement(text) {
 
   return {
     provider,
-    transactions: normalizeTransactions(transactions),
+    transactions: normalizeTransactions(transactions.map((t) => ({ ...t, provider }))),
   };
 }
 
