@@ -19,7 +19,7 @@ Know where your money actually goes. Upload your PhonePe statement PDF, get inst
 - 🔐 **Authentication** — JWT-based registration, login, protected routes, token verification, and automatic logout on unauthorized responses
 - 🤖 **AI Recommendations** — Gemini-powered financial recommendations using the user's spending context
 - 🔄 **AI Retry Handling** — Temporary Gemini service failures can be retried automatically
-- ❤️ **Health Check** — `GET /api/health` endpoint for monitoring
+- ❤️ **Health Check** — `GET /health` endpoint for monitoring
 - 🧪 **Automated Testing** — Jest test suite covering backend functionality and Gemini provider behavior
 
 ### Analytics Engine (`src/utils/analytics.js`)
@@ -308,7 +308,7 @@ Authorization: Bearer <token>
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| GET | `/api/health` | Server status check |
+| GET | `/health` | Server status check |
 
 
 ### Authentication

@@ -8,12 +8,14 @@ const STATES = {
   PROCESSING: 'processing',
   ERROR: 'error',
   SUCCESS: 'success',
+  NO_CHANGES: 'no-changes',
 }
 
 function UploadZone({ onUpload }) {
   const [state, setState] = useState(STATES.IDLE)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
+  const [result, setResult] = useState(null)
   const fileInputRef = useRef(null)
 
   const processFile = useCallback(async (file) => {
@@ -31,10 +33,11 @@ function UploadZone({ onUpload }) {
     
     setState(STATES.PROCESSING)
     setProgress(0)
-    
+    setResult(null)
+    let progressInterval
     try {
       // Simulate progress
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setProgress(p => {
           if (p >= 90) {
             clearInterval(progressInterval)
@@ -44,25 +47,18 @@ function UploadZone({ onUpload }) {
         })
       }, 200)
       
-      // Try to parse PDF, fall back to sample data
-      let transactions = null
-      try {
-        const { parsePDF } = await import('../utils/pdfParser')
-        transactions = await parsePDF(file)
-      } catch (parseError) {
-        console.warn('PDF parsing failed, using sample data:', parseError)
-      }
-      
+      const outcome = await onUpload(file)
+      if (outcome?.success === false) throw new Error(outcome.message || 'Upload failed')
       clearInterval(progressInterval)
       setProgress(100)
-      
-      setTimeout(() => {
-        setState(STATES.SUCCESS)
-        onUpload(transactions, file.name, file)
-      }, 500)
+      setResult(outcome)
+      setState(outcome?.count === 0 && outcome?.skipped > 0 ? STATES.NO_CHANGES : STATES.SUCCESS)
     } catch (err) {
+      clearInterval(progressInterval)
       setState(STATES.ERROR)
       setError(err.message || 'Failed to process file.')
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }, [onUpload])
 
@@ -96,6 +92,8 @@ function UploadZone({ onUpload }) {
         return 'border-red-300 bg-red-50 border-solid'
       case STATES.SUCCESS:
         return 'border-green-300 bg-green-50 border-solid'
+      case STATES.NO_CHANGES:
+        return 'border-blue-300 bg-blue-50 border-solid'
       default:
         return 'border-gray-200 border-dashed hover:border-blue-300 hover:bg-blue-50/30 hover:shadow-lg hover:shadow-blue-50'
     }
@@ -140,8 +138,25 @@ function UploadZone({ onUpload }) {
             <div className="w-20 h-20 rounded-2xl bg-green-50 flex items-center justify-center mx-auto mb-4">
               <span className="text-4xl">✅</span>
             </div>
-            <p className="font-semibold text-green-700 text-lg">Successfully uploaded!</p>
+            <p className="font-semibold text-green-700 text-lg">
+              {result?.count ?? 0} new transaction{result?.count === 1 ? '' : 's'} imported
+            </p>
+            {result?.skipped > 0 && <p className="text-gray-500 text-sm mt-2">{result.skipped} duplicate{result.skipped === 1 ? '' : 's'} skipped</p>}
             <p className="text-gray-400 text-sm mt-2">Redirecting to dashboard...</p>
+          </>
+        ) : state === STATES.NO_CHANGES ? (
+          <>
+            <div className="w-20 h-20 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">ℹ️</span>
+            </div>
+            <p className="font-semibold text-blue-700 text-lg">No new transactions imported</p>
+            <p className="text-gray-500 text-sm mt-2">{result?.skipped} already existed in your account.</p>
+            <button
+              onClick={(e) => { e.stopPropagation(); setState(STATES.IDLE); setResult(null) }}
+              className="px-5 py-2.5 mt-4 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50"
+            >
+              Upload another PDF
+            </button>
           </>
         ) : state === STATES.ERROR ? (
           <>

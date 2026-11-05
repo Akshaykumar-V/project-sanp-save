@@ -2,33 +2,18 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import UploadZone from '../components/UploadZone'
 import { useTransactions } from '../hooks/useTransactions'
-import { sampleTransactions } from '../data/sampleData'
-import { useAuth } from '../context/AuthContext'
 import { uploadPDF } from '../utils/api'
 
 function UploadPage() {
   const navigate = useNavigate()
-  const { uploadTransactions, refetch } = useTransactions()
-  const { isAuthenticated } = useAuth()
+  const { refetch } = useTransactions()
   
-  const handleUpload = async (transactions, filename, file) => {
-    if (isAuthenticated && file) {
-      try {
-        // Upload PDF to backend
-        await uploadPDF(file)
-        // Refetch transactions from server so dashboard has fresh data
-        await refetch()
-        setTimeout(() => navigate('/dashboard'), 1500)
-        return
-      } catch (err) {
-        console.warn('Backend upload failed, using local parse:', err.message)
-      }
-    }
-
-    // Fallback: use locally parsed data or sample data
-    const data = transactions || sampleTransactions
-    uploadTransactions(data, filename)
-    setTimeout(() => navigate('/dashboard'), 1500)
+  const handleUpload = async (file) => {
+    const result = await uploadPDF(file)
+    if (result.count > 0) await refetch()
+    if (!result.success) throw new Error(result.message || 'Upload failed')
+    if (result.count > 0) setTimeout(() => navigate('/dashboard'), 1500)
+    return result
   }
   
   return (
@@ -73,24 +58,11 @@ function UploadPage() {
           <div>
             <p className="font-semibold text-green-800">Privacy First</p>
             <p className="text-sm text-green-700 mt-0.5 leading-relaxed">
-              {isAuthenticated
-                ? 'Your PDF is securely uploaded and processed on our server. Your data is stored in your private account and is never shared.'
-                : 'Your PDF is processed entirely in your browser. No data is uploaded to any server. Your financial data stays 100% private.'}
+              Your PDF is uploaded and processed on our server. Your transactions are stored in your private account.
             </p>
           </div>
         </div>
         
-        {/* Try with sample data */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => handleUpload(null, 'Sample Data')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-full text-sm font-medium text-gray-700 transition-all hover:shadow-sm"
-          >
-            <span>🧪</span>
-            Don&apos;t have a PDF? Try with sample data
-            <span>→</span>
-          </button>
-        </div>
       </div>
     </div>
   )
