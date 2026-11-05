@@ -1,4 +1,5 @@
 const { normalizeTransaction } = require('./normalizer');
+const { extractIdentifiers } = require('./identifiers');
 const { categorize } = require('../categorize');
 
 const DATE_PATTERN = /(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/;
@@ -14,6 +15,9 @@ function parsePhonePe(text) {
 }
 
 function parsePhonePeLine(line) {
+  const rawText = line;
+  const { text, transactionId, utrNumber } = extractIdentifiers(line);
+  line = text;
   const dateMatch = line.match(DATE_PATTERN);
   const amounts = [...line.matchAll(AMOUNT_PATTERN)];
 
@@ -60,7 +64,9 @@ function parsePhonePeLine(line) {
         ? 'CREDIT'
         : 'DEBIT',
     category: categorize(merchant),
-    rawText: line,
+    rawText,
+    transactionId,
+    utrNumber,
   });
 }
 
