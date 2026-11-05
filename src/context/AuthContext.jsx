@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import {
   authAPI,
   getToken,
@@ -18,40 +18,63 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(getStoredUser)
+  const [user, setUser] = useState(() => getToken() ? getStoredUser() : null)
   const [loading, setLoading] = useState(!!getToken())
   const [error, setError] = useState(null)
+  const sessionVersion = useRef(0)
 
   const isAuthenticated = !!user && !!getToken()
 
-  // Verify token on mount
+  // A cached user is only a placeholder until the token is verified.
   useEffect(() => {
     const token = getToken()
-    if (token && !user) {
-      setLoading(true)
-      const timeout = setTimeout(() => {
-        // If backend is unreachable after 5s, stop loading and clear stale token
-        setLoading(false)
-        logout()
-      }, 5000)
-      authAPI
-        .getMe()
-        .then((data) => {
-          clearTimeout(timeout)
-          setUser(data.user)
-          setStoredUser(data.user)
-        })
-        .catch(() => {
-          clearTimeout(timeout)
-          logout()
-        })
-        .finally(() => setLoading(false))
+    if (!token) {
+      removeStoredUser()
+      setUser(null)
+      setLoading(false)
+      return
     }
-    // Intentionally runs once on mount to restore the authenticated session.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    const version = ++sessionVersion.current
+    let active = true
+    const isCurrent = () => active && sessionVersion.current === version
+    const clearSession = () => {
+      removeToken()
+      removeStoredUser()
+      setUser(null)
+    }
+    const timeout = setTimeout(() => {
+      if (!isCurrent()) return
+      active = false
+      clearSession()
+      setLoading(false)
+    }, 5000)
+
+    authAPI.getMe()
+      .then((data) => {
+        if (!isCurrent()) return
+        if (!data?.user) throw new Error('Invalid session')
+        setUser(data.user)
+        setStoredUser(data.user)
+      })
+      .catch(() => {
+        if (isCurrent()) clearSession()
+      })
+      .finally(() => {
+        if (!isCurrent()) return
+        clearTimeout(timeout)
+        setLoading(false)
+      })
+
+    return () => {
+      active = false
+      clearTimeout(timeout)
+    }
+    // Session restoration runs once when the provider mounts.
   }, [])
 
   async function register(name, email, password) {
+    sessionVersion.current += 1
     setError(null)
     setLoading(true)
     try {
@@ -69,6 +92,7 @@ export function AuthProvider({ children }) {
   }
 
   async function login(email, password) {
+    sessionVersion.current += 1
     setError(null)
     setLoading(true)
     try {
@@ -86,10 +110,12 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
+    sessionVersion.current += 1
     removeToken()
     removeStoredUser()
     setUser(null)
     setError(null)
+    setLoading(false)
   }
 
   function clearError() {
