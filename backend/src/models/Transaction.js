@@ -82,6 +82,7 @@ const transactionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    importKeys: { type: [String], default: undefined, select: false },
     utrNumber: {
       type: String,
       default: null,
@@ -92,6 +93,12 @@ const transactionSchema = new mongoose.Schema(
 
 // Compound index for fast per-user date-range queries
 transactionSchema.index({ user: 1, date: -1 });
+// Only new identified imports participate; legacy records are never rewritten.
+transactionSchema.index({ user: 1, importKeys: 1 }, {
+  name: 'unique_user_import_keys',
+  unique: true,
+  partialFilterExpression: { importKeys: { $exists: true } },
+});
 
 // Static: fetch transactions for a user within a date range
 transactionSchema.statics.getByDateRange = function (userId, startDate, endDate) {

@@ -1,133 +1,86 @@
 const multer = require('multer');
 const { PDFParse } = require('pdf-parse');
-const Transaction = require('../models/Transaction');
+const { importTransactions } = require('../utils/importTransactions');
 const { parseUPIStatement } = require('../utils/parsers');
 
-// ─── Multer configuration ────────────────────────────────────────
-const storage = multer.memoryStorage();
-
-const fileFilter = (_req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PDF files are allowed.'), false);
-  }
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+const receivePDF = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (_req, file, cb) => cb(
+    file.mimetype === 'application/pdf' ? null : new Error('Only PDF files are allowed.'),
+    file.mimetype === 'application/pdf'
+  ),
+  limits: { fileSize: 5 * 1024 * 1024 },
 }).single('pdf');
 
-
-
-
-// ─── POST /api/upload — upload & parse PhonePe PDF ───────────────
-async function uploadPDF(req, res) {
-  try {
-    // 1. Check file exists
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'No PDF file uploaded. Use field name "pdf".',
-      });
-    }
-
-    const { buffer, originalname } = req.file;
-
-    // 2. Extract text from PDF
-    let rawText;
-
-    try {
-      const parser = new PDFParse({ data: buffer });
-      const pdfData = await parser.getText();
-
-      rawText = pdfData.text;
-
-      await parser.destroy();
-    } catch (parseErr) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or corrupted PDF file. Could not read contents.',
-      });
-    }
-
-    if (!rawText || rawText.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message:
-          'Could not extract text from this PDF. It may be a scanned image or encrypted.',
-      });
-    }
-
-   
-   /// 3. Parse transactions from extracted text
-const { provider, transactions } = parseUPIStatement(rawText);
-const parsed = transactions;
-
-if (!parsed.length) {
-  return res.status(400).json({
-    success: false,
-    message:
-      `No transactions found in this PDF. Detected provider: ${provider}.`,
-    rawTextLength: rawText.length,
+function upload(req, res, next) {
+  receivePDF(req, res, (error) => {
+    if (error) return res.status(400).json({ success: false,
+      message: error.code === 'LIMIT_FILE_SIZE' ? 'PDF file exceeds the 5 MB limit.' : 'Invalid PDF upload. Use field name "pdf".',
+    });
+    next();
   });
 }
 
-    // 4. Attach user id
-    const userId = req.user.id;
-
-    const docs = parsed.map((t) => ({
-      ...t,
-      user: userId,
-    }));
-
-    // 5. Bulk insert into database
-    let saved;
-
+async function uploadPDF(req, res) {
+  try {
+    if (!req.file) return res.status(400).json({ success: false,
+      message: 'No PDF file uploaded. Use field name "pdf".',
+    });
+    const { buffer, originalname } = req.file;
+    let rawText;
+    let parser;
     try {
-      saved = await Transaction.insertMany(docs, {
-        ordered: false,
+      parser = new PDFParse({ data: buffer });
+      rawText = (await parser.getText()).text;
+    } catch (_error) {
+      return res.status(400).json({ success: false,
+        message: 'Invalid or corrupted PDF file. Could not read contents.',
       });
-    } catch (dbErr) {
-      // Partial insert — some transactions may have succeeded
-      if (dbErr.insertedDocs && dbErr.insertedDocs.length > 0) {
-        return res.status(207).json({
-          success: true,
-          message: `Partially imported: ${dbErr.insertedDocs.length} of ${docs.length} transactions saved. Some failed validation.`,
-          count: dbErr.insertedDocs.length,
-          transactions: dbErr.insertedDocs,
-          errors: dbErr.writeErrors?.map((e) => e.errmsg),
-        });
-      }
-
-      console.error('uploadPDF DB error:', dbErr.message);
-
-      return res.status(500).json({
-        success: false,
+    } finally {
+      if (parser) await parser.destroy().catch(() => {});
+    }
+    if (!rawText || !rawText.trim()) return res.status(400).json({ success: false,
+      message: 'Could not extract text from this PDF. It may be a scanned image or encrypted.',
+    });
+    const { provider, transactions } = parseUPIStatement(rawText);
+    if (!transactions.length) return res.status(400).json({ success: false,
+      message: `No transactions found in this PDF. Detected provider: ${provider}.`,
+      rawTextLength: rawText.length,
+    });
+    let result;
+    try {
+      result = await importTransactions(transactions, req.user.id);
+    } catch (_error) {
+      return res.status(500).json({ success: false,
         message: 'Database error while saving transactions.',
       });
     }
-
-    // 6. Success response
+    const { saved, duplicates, errors } = result;
+    const counts = {
+      count: saved.length,
+      skipped: duplicates,
+      total: transactions.length,
+      transactions: saved,
+    };
+    if (errors.length) return res.status(saved.length || duplicates ? 207 : 500).json({
+      success: false,
+      message: `${saved.length} imported, ${duplicates} skipped; ${errors.length} failed.`,
+      ...counts,
+      errors,
+    });
+    if (!saved.length) return res.status(200).json({
+      success: true,
+      message: `No new transactions imported from "${originalname}". ${duplicates} already existed.`,
+      ...counts,
+    });
     return res.status(201).json({
       success: true,
-      count: saved.length,
-      message: `${saved.length} transactions imported from "${originalname}".`,
-      transactions: saved,
+      message: `${saved.length} transactions imported from "${originalname}"; ${duplicates} skipped.`,
+      ...counts,
     });
-  } catch (err) {
-    console.error('uploadPDF error:', err.message);
-
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to process PDF.',
-    });
+  } catch (_error) {
+    return res.status(500).json({ success: false, message: 'Failed to process PDF.' });
   }
 }
 
-module.exports = {
-  upload,
-  uploadPDF,
-};
+module.exports = { upload, uploadPDF };
